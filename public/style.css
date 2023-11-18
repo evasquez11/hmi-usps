@@ -2,18 +2,19 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
     color: #333;
+    text-align: center;
     padding: 20px;
-    margin: 0;
 }
 
-#sensorDisplay {
+#sensorData {
+    margin-top: 20px;
+}
+
+.sensor-display {
     background-color: #ffffff;
     border: 1px solid #ddd;
     padding: 15px;
     margin-top: 20px;
-    text-align: center;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
-/* Add more styles as needed for other elements */

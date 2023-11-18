@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Sensor Data Display</title>
-    <!-- Add other head elements here -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="sensorDisplay">Sensor Value: --</div>
+    <h1>Sensor Data Monitoring</h1>
+    
+    <div id="sensorData">
+        <div id="gpioDisplay" class="sensor-display">GPIO Sensor Value: --</div>
+        <div id="i2cDisplay" class="sensor-display">I2C Sensor Value: --</div>
+    </div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="sensor-data.js"></script>
 </body>
