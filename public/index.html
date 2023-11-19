@@ -4,14 +4,23 @@
     <meta charset="UTF-8">
     <title>Sensor Data Display</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <h1>Sensor Data Monitoring</h1>
-    
+
     <div id="sensorData">
         <div id="gpioDisplay" class="sensor-display">GPIO Sensor Value: --</div>
-        <div id="i2cDisplay" class="sensor-display">I2C Sensor Value: --</div>
+        <div id="i2cDisplay" class="sensor-display">Magnetic Field Strength: --</div>
         <div id="rs485Display" class="sensor-display">Distance: -- mm</div>
+    </div>
+
+    <div id="chartContainer">
+        <button id="gpioButton">GPIO Sensor Value</button>
+        <button id="i2cButton">Magnetic Field Strength</button>
+        <button id="rs485Button">Distance Sensor</button>
+
+        <canvas id="sensorChart"></canvas>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
