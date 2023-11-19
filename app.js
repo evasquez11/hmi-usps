@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+// const MockRS485 = require('./mock-rs485'); // Import mock RS485
 
 // Determine if running on Raspberry Pi
 const isRaspberryPi = false; // Change this based on your environment detection logic
@@ -11,6 +12,9 @@ const Gpio = isRaspberryPi ? require('onoff').Gpio : require('./mock-gpio').Gpio
 // Conditional imports for I2C
 const I2C = isRaspberryPi ? require('real-i2c-library') : require('./mock-i2c');
 
+const RS485 = require(isRaspberryPi ? 'serialport' : './mock-rs485');
+
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -18,7 +22,7 @@ const io = socketIo(server);
 app.use(express.static('public')); // Serve static files from 'public' directory
 
 io.on('connection', (socket) => {
-    // Example GPIO sensor
+    // GPIO sensor setup
     const gpioSensor = new Gpio(17, 'in', 'both'); // Using GPIO pin 17 as an example
     gpioSensor.watch((err, value) => {
         if (err) {
@@ -28,16 +32,19 @@ io.on('connection', (socket) => {
         }
     });
 
-// Inside io.on('connection', ...)
-const i2cSensor = new I2C(0x00, 1); // Using mock I2C
+    // I2C sensor setup
+    const i2cSensor = new I2C(0x00, 1); // Using mock I2C
+    setInterval(async () => {
+        const magneticStrength = await i2cSensor.readSensorData();
+        socket.emit('i2cData', { magneticStrength });
+    }, 2000); // Adjust the interval as needed
 
-setInterval(async () => {
-    const magneticStrength = await i2cSensor.readSensorData();
-    // console.log("Emitting magnetic strength:", magneticStrength); // Check the output
-    socket.emit('i2cData', { magneticStrength });
-}, 2000);
-
-
+    // RS485 sensor setup
+    const rs485Sensor = new RS485(); // Using mock RS485
+    setInterval(async () => {
+        const distance = await rs485Sensor.readDistance();
+        socket.emit('rs485Data', { distance });
+    }, 1000); // Adjust the interval as needed
 
     socket.on('disconnect', () => {
         console.log('Client disconnected');
