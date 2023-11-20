@@ -7,7 +7,10 @@ body {
 }
 
 #sensorData {
-    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns of equal width */
+    gap: 20px; /* Space between columns */
+    margin: 20px 0;
 }
 
 .sensor-display {
@@ -28,4 +31,23 @@ button {
     margin: 5px;
     padding: 10px;
 }
+
+.sensor-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px; /* Adds space between each row */
+}
+
+.sensor-graph {
+    width: 45%; /* Assigns width to each graph. Adjust as necessary to fit your layout */
+    /* You can also add padding or margin here if you need some space between the graphs */
+}
+
+canvas {
+    width: 100%; /* Canvas takes the full width of its container */
+    height: auto; /* Height is set automatically to maintain aspect ratio */
+}
+
+/* Add any additional styling you need here */
+
 
