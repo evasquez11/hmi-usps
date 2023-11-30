@@ -10,8 +10,12 @@ class MockI2C {
     readSensorData() {
         return new Promise((resolve) => {
             // Simulate magnetic field strength
-            const magneticFieldStrength = Math.random() * 100; // Adjust the range as per your sensor's typical values
-            setTimeout(() => resolve(magneticFieldStrength), 100);
+            //const magneticFieldStrength = Math.random() * 100; // Adjust the range as per your sensor's typical values
+            const x = Math.random() * 100; // Adjust the range as needed
+            const y = Math.random() * 100; // Adjust the range as needed
+            const z = Math.random() * 100; // Adjust the range as needed
+
+            setTimeout(() => resolve(resolve({x,y,z})), 100);
         });
     }
 

@@ -36,17 +36,19 @@ io.on('connection', (socket) => {
         else socket.emit('gpioData2', value);
     });
 
+    const MockI2C = require('./mock-i2c'); // Replace with the actual path to your mock-i2c.js file
+
     // Example I2C sensor setup
-    const i2cSensor1 = new I2C(0x00, 1); // First I2C sensor
+    const i2cSensor1 = new I2C(0xBD, 1); // First I2C sensor
     const i2cSensor2 = new I2C(0x01, 1); // Second I2C sensor
     // Replace 0x00 and 0x01 with actual I2C addresses for real sensors
 
     setInterval(async () => {
         const magneticStrength1 = await i2cSensor1.readSensorData();
-        socket.emit('i2cData1', { magneticStrength: magneticStrength1 });
+        socket.emit('i2cData1',  magneticStrength1 );
 
         const magneticStrength2 = await i2cSensor2.readSensorData();
-        socket.emit('i2cData2', { magneticStrength: magneticStrength2 });
+        socket.emit('i2cData2',  magneticStrength2 );
     }, 2000);
 
     // Example RS485 sensor setup
