@@ -2,18 +2,52 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
     color: #333;
+    text-align: center;
     padding: 20px;
-    margin: 0;
 }
 
-#sensorDisplay {
+#sensorData {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns of equal width */
+    gap: 20px; /* Space between columns */
+    margin: 20px 0;
+}
+
+.sensor-display {
     background-color: #ffffff;
     border: 1px solid #ddd;
     padding: 15px;
     margin-top: 20px;
-    text-align: center;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Add more styles as needed for other elements */
+#sensorChart {
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+button {
+    margin: 5px;
+    padding: 10px;
+}
+
+.sensor-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px; /* Adds space between each row */
+}
+
+.sensor-graph {
+    width: 45%; /* Assigns width to each graph. Adjust as necessary to fit your layout */
+    /* You can also add padding or margin here if you need some space between the graphs */
+}
+
+canvas {
+    width: 100%; /* Canvas takes the full width of its container */
+    height: auto; /* Height is set automatically to maintain aspect ratio */
+}
+
+/* Add any additional styling you need here */
+
+

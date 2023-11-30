@@ -3,10 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <title>Sensor Data Display</title>
-    <!-- Add other head elements here -->
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div id="sensorDisplay">Sensor Value: --</div>
+    <h1>Sensor Data Monitoring</h1>
+
+    <!-- GPIO Sensors Row -->
+    <div class="sensor-row">
+        <div class="sensor-graph">
+            <h2>GPIO Sensor 1</h2>
+            <canvas id="gpioChart1"></canvas>
+        </div>
+        <div class="sensor-graph">
+            <h2>GPIO Sensor 2</h2>
+            <canvas id="gpioChart2"></canvas>
+        </div>
+    </div>
+
+    <!-- Magnetic Field Strength Sensors Row -->
+    <div class="sensor-row">
+        <div class="sensor-graph">
+            <h2>Magnetic Field Strength 1</h2>
+            <canvas id="i2cChart1"></canvas>
+        </div>
+        <div class="sensor-graph">
+            <h2>Magnetic Field Strength 2</h2>
+            <canvas id="i2cChart2"></canvas>
+        </div>
+    </div>
+
+    <!-- Distance Sensors Row -->
+    <div class="sensor-row">
+        <div class="sensor-graph">
+            <h2>Distance Sensor 1</h2>
+            <canvas id="rs485Chart1"></canvas>
+        </div>
+        <div class="sensor-graph">
+            <h2>Distance Sensor 2</h2>
+            <canvas id="rs485Chart2"></canvas>
+        </div>
+    </div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="sensor-data.js"></script>
 </body>
