@@ -9,7 +9,7 @@ const isRaspberryPi = true; // Change this based on your environment detection l
 const Gpio = isRaspberryPi ? require('onoff').Gpio : require('./mock-gpio').Gpio;
 
 // Conditional imports for I2C
-const I2C = isRaspberryPi ? require('real-i2c-library') : require('./mock-i2c');
+const I2C = isRaspberryPi ? require('i2c-bus') : require('./mock-i2c');
 
 const RS485 = require(isRaspberryPi ? 'serialport' : './mock-rs485');
 
