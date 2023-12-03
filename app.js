@@ -9,7 +9,9 @@ const isRaspberryPi = false; // Change this based on your environment detection 
 const Gpio = isRaspberryPi ? require('onoff').Gpio : require('./mock-gpio').Gpio;
 
 // Conditional imports for I2C
-const I2C = isRaspberryPi ? require('real-i2c-library') : require('./mock-i2c');
+// app.js
+const MockI2C = isRaspberryPi ? require('./adafruit-tlv493-i2c') : require('./mock-i2c');
+
 
 const RS485 = require(isRaspberryPi ? 'serialport' : './mock-rs485');
 
@@ -19,6 +21,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 app.use(express.static('public')); // Serve static files from 'public' directory
+
 
 io.on('connection', (socket) => {
     // Example GPIO sensor setup
