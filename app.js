@@ -22,9 +22,12 @@ app.use(express.static('public')); // Serve static files from 'public' directory
 
 io.on('connection', (socket) => {
     // Example GPIO sensor setup
-    const gpioSensor1 = new Gpio(17, 'in', 'both'); // First GPIO sensor
-    const gpioSensor2 = new Gpio(18, 'in', 'both'); // Second GPIO sensor
+    // const gpioSensor1 = new Gpio(17, 'in', 'both'); // First GPIO sensor
+    // const gpioSensor2 = new Gpio(18, 'in', 'both'); // Second GPIO sensor
     // Replace 17 and 18 with actual GPIO pins for real sensors
+    const gpioSensor1 = new Gpio(17, 'out'); // Use gpioSensor1 as LED (output)
+    const gpioSensor2 = new Gpio(4, 'in', 'both'); // Use gpioSensor2 as Button (input)
+
 
     gpioSensor1.watch((err, value) => {
         if (err) console.error('GPIO Error:', err);
