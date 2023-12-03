@@ -13,6 +13,13 @@ services:
       - DB_USER=sensoradmin
       - DB_PASSWORD=sensorpassword
       - DB_NAME=sensor_data
+    volumes:
+      - "/sys/class/gpio:/sys/class/gpio"
+      - "/sys/devices/platform/soc:/sys/devices/platform/soc"
+    devices:
+      - "/dev/gpiomem:/dev/gpiomem"
+    # Uncomment the line below if privileged mode is needed
+    # privileged: true
 
   db:
     image: mysql:latest
