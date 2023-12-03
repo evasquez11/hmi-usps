@@ -3,7 +3,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 
 // Determine if running on Raspberry Pi
-const isRaspberryPi = false; // Change this based on your environment detection logic
+const isRaspberryPi = true; // Change this based on your environment detection logic
 
 // Conditional imports for GPIO
 const Gpio = isRaspberryPi ? require('onoff').Gpio : require('./mock-gpio').Gpio;
