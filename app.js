@@ -42,8 +42,8 @@ io.on('connection', (socket) => {
     const MockI2C = require('./mock-i2c'); // Replace with the actual path to your mock-i2c.js file
 
     // Example I2C sensor setup
-    const i2cSensor1 = new I2C(0xBD, 20); // First I2C sensor
-    const i2cSensor2 = new I2C(0x01, 1); // Second I2C sensor
+    const i2cSensor1 = new MockI2C(0xBD, 20); // First I2C sensor
+    const i2cSensor2 = new MockI2C(0x01, 1); // Second I2C sensor
     // Replace 0x00 and 0x01 with actual I2C addresses for real sensors
 
     setInterval(async () => {
