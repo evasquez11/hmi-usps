@@ -15,7 +15,7 @@ class MockI2C {
             const y = Math.random() * 100; // Adjust the range as needed
             const z = Math.random() * 100; // Adjust the range as needed
 
-            setTimeout(() => resolve(resolve({x,y,z})), 100);
+            setTimeout(() => resolve(({x,y,z})), 100);
         });
     }
 
