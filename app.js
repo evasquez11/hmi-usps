@@ -17,21 +17,21 @@ app.use(express.static('public')); // Serve static files from 'public' directory
 
 io.on('connection', (socket) => {
 
-    const gpioSensor1 = new Gpio(17, 'out'); // Use gpioSensor1 as LED (output)
-    const gpioSensor2 = new Gpio(4, 'in', 'both'); // Use gpioSensor2 as Button (input)
+    // const gpioSensor1 = new Gpio(17, 'out'); // Use gpioSensor1 as LED (output)
+    // const gpioSensor2 = new Gpio(4, 'in', 'both'); // Use gpioSensor2 as Button (input)
 
 
-    gpioSensor1.writeSync(1); // Turn LED on
-    setTimeout(() => gpioSensor1.writeSync(0), 2000); // Turn LED off after 2 seconds
+    // gpioSensor1.writeSync(1); // Turn LED on
+    // setTimeout(() => gpioSensor1.writeSync(0), 2000); // Turn LED off after 2 seconds
         
-    gpioSensor2.watch((err, value) => {
-        if (err) {
-            console.error('GPIO Error:', err);
-        } else {
-            gpioSensor1.writeSync(value); // Turn on/off LED based on button state
-            socket.emit('gpioData2', value); // Emit button state to client
-        }
-    });
+    // gpioSensor2.watch((err, value) => {
+    //     if (err) {
+    //         console.error('GPIO Error:', err);
+    //     } else {
+    //         gpioSensor1.writeSync(value); // Turn on/off LED based on button state
+    //         socket.emit('gpioData2', value); // Emit button state to client
+    //     }
+    // });
     
     const gpioSensor3 = new Gpio(27, 'out'); // New LED (output)
     const gpioSensor4 = new Gpio(22, 'in', 'both'); // New Button (input)
