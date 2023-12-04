@@ -18,6 +18,7 @@ services:
       - "/sys/devices/platform/soc:/sys/devices/platform/soc"
     devices:
       - "/dev/gpiomem:/dev/gpiomem"
+      - "/dev/i2c-1:/dev/i2c-1" # Added for I2C access
     # Uncomment the line below if privileged mode is needed
     # privileged: true
 
