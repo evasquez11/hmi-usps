@@ -25,14 +25,21 @@ const REGISTERS = {
 };
 
 const readAxisData = (registerPair) => {
-  const highByte = i2cBus.readByteSync(MAGNETOMETER_I2C_ADDRESS, registerPair[0]);
-  const lowByte = i2cBus.readByteSync(MAGNETOMETER_I2C_ADDRESS, registerPair[1]);
-  let combined = (highByte << 8) | lowByte;
-  if (combined & 0x8000) {
-    combined = -(0x10000 - combined);
-  }
-  return combined * 0.098;
-};
+    const highByte = i2cBus.readByteSync(MAGNETOMETER_I2C_ADDRESS, registerPair[0]);
+    const lowByte = i2cBus.readByteSync(MAGNETOMETER_I2C_ADDRESS, registerPair[1]);
+    console.log(`High byte for ${registerPair}:`, highByte); // Log high byte
+    console.log(`Low byte for ${registerPair}:`, lowByte); // Log low byte
+  
+    let combined = (highByte << 8) | lowByte;
+    if (combined & 0x8000) { // If the value is negative
+      combined = -(0x10000 - combined);
+    }
+  
+    const magneticFieldValue = combined * 0.098; // Convert to milliteslas
+    console.log(`Magnetic field value for ${registerPair}:`, magneticFieldValue); // Log magnetic field value
+    return magneticFieldValue;
+  };
+  
 
 const readSensorData = () => {
   let Bx = readAxisData(REGISTERS.Bx);
