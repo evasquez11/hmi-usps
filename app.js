@@ -33,29 +33,20 @@ io.on('connection', (socket) => {
         }
     });
 
-        // New LED setup for gpioSensor3
-        const gpioSensor3 = new Gpio(6, 'out'); // New LED on GPIO 6
-        gpioSensor3.writeSync(1); // Turn new LED on and keep it on
-    
-        // You can remove the gpioSensor4 code if it's not being used
-        // const gpioSensor4 = new Gpio(5, 'in', 'both'); // New Button (input)
-        // Remove or comment out the gpioSensor4 watch functionality
-    
-    
-    // const gpioSensor3 = new Gpio(6, 'out'); // New LED (output)
-    // const gpioSensor4 = new Gpio(5, 'in', 'both'); // New Button (input)
+    const gpioSensor3 = new Gpio(6, 'out'); // New LED on GPIO 6
+    gpioSensor3.writeSync(1); // Turn new LED on and keep it on
 
-    // gpioSensor3.writeSync(1); // Turn new LED on
-    // setTimeout(() => gpioSensor3.writeSync(0), 2000); // Turn new LED off after 2 seconds
+    // Reintroduce the switch (gpioSensor4)
+    const gpioSensor4 = new Gpio(5, 'in', 'both'); // New switch (input) on GPIO 5
 
-    // gpioSensor4.watch((err, value) => {
-    //     if (err) {
-    //         console.error('GPIO Error:', err);
-    //     } else {
-    //         gpioSensor3.writeSync(value); // Turn on/off new LED based on new button state
-    //         socket.emit('gpioData1', value); // Emit new button state to client
-    //     }
-    // });
+    gpioSensor4.watch((err, value) => {
+        if (err) {
+            console.error('GPIO Error:', err);
+        } else {
+            gpioSensor3.writeSync(value); // Turn on/off the new LED based on the switch state
+            socket.emit('gpioData1', value); // Emit the switch state to the client
+        }
+    });
 
 
 
