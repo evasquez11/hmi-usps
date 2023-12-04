@@ -108,6 +108,9 @@ function updateMagneticFieldChart(chart, data) {
 // WebSocket event listeners for sensor data
 socket.on('gpioData1', (value) => updateChart(gpioChart1, value));
 socket.on('gpioData2', (value) => updateChart(gpioChart2, value));
-socket.on('i2cData1', (data) => updateMagneticFieldChart(magneticFieldChart, data));
+socket.on('i2cData1', (data) => {
+    console.log('Received i2cData1:', data); // Debugging line
+    updateMagneticFieldChart(magneticFieldChart, data);
+});
 socket.on('rs485Data1', (data) => updateChart(rs485Chart1, data.distance));
 socket.on('rs485Data2', (data) => updateChart(rs485Chart2, data.distance));
