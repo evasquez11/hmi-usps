@@ -22,7 +22,6 @@ io.on('connection', (socket) => {
 
 
     gpioSensor1.writeSync(1); // Turn LED on
-    setTimeout(() => gpioSensor1.writeSync(0), 2000); // Turn LED off after 2 seconds
         
     gpioSensor2.watch((err, value) => {
         if (err) {
