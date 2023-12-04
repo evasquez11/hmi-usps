@@ -4,7 +4,7 @@ const socketIo = require('socket.io');
 const i2c = require('i2c-bus');
 
 // Determine if running on Raspberry Pi
-const isRaspberryPi = true; // Change this based on your environment detection logic
+const isRaspberryPi = true;
 
 // Conditional imports for GPIO
 const Gpio = isRaspberryPi ? require('onoff').Gpio : require('./mock-gpio').Gpio;
@@ -13,94 +13,125 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-app.use(express.static('public')); // Serve static files from 'public' directory
+app.use(express.static('public'));
 
-// Magnetometer setup
-const MAGNETOMETER_I2C_ADDRESS = 0x5E; // Magnetometer I2C address
-const i2cBus = i2c.openSync(1); // Open I2C bus
-const REGISTERS = {
-  Bx: [0x00, 0x01], // Bx high byte, Bx low byte
-  By: [0x02, 0x03], // By high byte, By low byte
-  Bz: [0x04, 0x05], // Bz high byte, Bz low byte
+const MAGNETOMETER_I2C_ADDRESS = 0x5E;
+const i2cBus = i2c.openSync(1);
+
+const MOD1_REGISTER = 0x1;
+const FAST_MODE_BIT = 0b00000010; // Bit for Fast Mode enabled
+
+// Function to calculate parity bit
+const calculateParity = (value) => {
+  let parity = 0;
+  while (value) {
+    parity ^= value & 1;
+    value >>= 1;
+  }
+  return parity;
 };
 
-const readAxisData = (registerPair) => {
-    const highByte = i2cBus.readByteSync(MAGNETOMETER_I2C_ADDRESS, registerPair[0]);
-    const lowByte = i2cBus.readByteSync(MAGNETOMETER_I2C_ADDRESS, registerPair[1]);
-    console.log(`High byte for ${registerPair}:`, highByte); // Log high byte
-    console.log(`Low byte for ${registerPair}:`, lowByte); // Log low byte
-  
-    let combined = (highByte << 8) | lowByte;
-    if (combined & 0x8000) { // If the value is negative
-      combined = -(0x10000 - combined);
-    }
-  
-    const magneticFieldValue = combined * 0.098; // Convert to milliteslas
-    console.log(`Magnetic field value for ${registerPair}:`, magneticFieldValue); // Log magnetic field value
-    return magneticFieldValue;
-  };
-  
+// Function to configure the sensor for Fast Mode
+const configureSensorForFastMode = () => {
+  // Combine the configuration bits
+  let configValue = FAST_MODE_BIT;
+  // Calculate the parity bit
+  let parityBit = calculateParity(configValue) << 7;
+  // Combine the parity bit with the configuration value
+  configValue |= parityBit;
 
-const readSensorData = () => {
-  let Bx = readAxisData(REGISTERS.Bx);
-  let By = readAxisData(REGISTERS.By);
-  let Bz = readAxisData(REGISTERS.Bz);
-  return { Bx, By, Bz };
+  try {
+    i2cBus.writeByteSync(MAGNETOMETER_I2C_ADDRESS, MOD1_REGISTER, configValue);
+    console.log(`Sensor configured for Fast Mode with MOD1 = ${configValue.toString(2)}`);
+  } catch (error) {
+    console.error('Error configuring sensor for Fast Mode:', error);
+  }
 };
 
-io.on('connection', (socket) => {
-    // GPIO LED/Button logic
-    const gpioSensor1 = new Gpio(17, 'out'); // Use gpioSensor1 as LED (output)
-    gpioSensor1.writeSync(1); // Turn LED on
+// Function to reset the sensor
+const resetSensor = () => {
+  try {
+    i2cBus.writeByteSync(MAGNETOMETER_I2C_ADDRESS, 0x00, 0x00);
+    console.log('Sensor reset command sent');
+  } catch (error) {
+    console.error('Error sending reset command to sensor:', error);
+  }
+};
 
-    const gpioSensor2 = new Gpio(4, 'in', 'both'); // Use gpioSensor2 as Button (input)
-    gpioSensor2.watch((err, value) => {
-        if (err) {
-            console.error('GPIO Error:', err);
-        } else {
-            gpioSensor1.writeSync(value); // Turn on/off LED based on button state
-            socket.emit('gpioData2', value); // Emit button state to client
-        }
-    });
-
-    const gpioSensor3 = new Gpio(6, 'out'); // New LED on GPIO 6
-    gpioSensor3.writeSync(1); // Turn new LED on and keep it on
-
-    const gpioSensor4 = new Gpio(5, 'in', 'both'); // New switch (input) on GPIO 5
-    gpioSensor4.watch((err, value) => {
-        if (err) {
-            console.error('GPIO Error:', err);
-        } else {
-            gpioSensor3.writeSync(value); // Turn on/off the new LED based on the switch state
-            socket.emit('gpioData1', value); // Emit the switch state to the client
-        }
-    });
-
-    // Magnetometer reading logic
-    setInterval(() => {
-        const magnetometerData = readSensorData();
-        socket.emit('i2cData1', magnetometerData); // Emit magnetometer data to client
-    }, 1000);
-
-    socket.on('disconnect', () => {
-        console.log('Client disconnected');
-        gpioSensor1.unexport();
-        gpioSensor2.unexport();
-        gpioSensor3.unexport();
-        gpioSensor4.unexport();
-    });
+// Call resetSensor and configureSensorForFastMode after setting up the server
+server.listen(3000, () => {
+  console.log('Server listening on port 3000');
+  resetSensor();
+  setTimeout(() => {
+    configureSensorForFastMode();
+  }, 100); // Adjust delay as necessary
 });
 
-server.listen(3000, () => {
-    console.log('Server listening on port 3000');
+// GPIO logic
+const gpioSensor1 = new Gpio(17, 'out');
+const gpioSensor2 = new Gpio(4, 'in', 'both');
+const gpioSensor3 = new Gpio(6, 'out');
+const gpioSensor4 = new Gpio(5, 'in', 'both');
+
+gpioSensor1.writeSync(1); // Turn on LED
+gpioSensor3.writeSync(1); // Turn on new LED
+
+gpioSensor2.watch((err, value) => {
+  if (err) {
+    console.error('GPIO Error:', err);
+  } else {
+    gpioSensor1.writeSync(value);
+    io.emit('gpioData2', value);
+  }
+});
+
+gpioSensor4.watch((err, value) => {
+  if (err) {
+    console.error('GPIO Error:', err);
+  } else {
+    gpioSensor3.writeSync(value);
+    io.emit('gpioData1', value);
+  }
+});
+
+// Magnetometer reading logic
+setInterval(() => {
+  const magnetometerData = readSensorData();
+  io.emit('i2cData1', magnetometerData);
+}, 1000);
+
+io.on('connection', (socket) => {
+  console.log('Client connected');
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
 });
 
 // Cleanup on exit
 process.on('SIGINT', () => {
-    gpioSensor1.unexport();
-    gpioSensor2.unexport();
-    gpioSensor3.unexport();
-    gpioSensor4.unexport();
-    i2cBus.closeSync(); // Close the I2C bus
-    process.exit();
+  gpioSensor1.unexport();
+  gpioSensor2.unexport();
+  gpioSensor3.unexport();
+  gpioSensor4.unexport();
+  i2cBus.closeSync();
+  process.exit();
 });
+
+// Function to read axis data from the magnetometer
+const readAxisData = (registerPair) => {
+  const highByte = i2cBus.readByteSync(MAGNETOMETER_I2C_ADDRESS, registerPair[0]);
+  const lowByte = i2cBus.readByteSync(MAGNETOMETER_I2C_ADDRESS, registerPair[1]);
+  let combined = (highByte << 8) | lowByte;
+  if (combined & 0x8000) {
+    combined = -(0x10000 - combined);
+  }
+  return combined * 0.098; // Adjust the multiplication factor based on your sensor's datasheet
+};
+
+// Function to read all sensor data
+const readSensorData = () => {
+  let Bx = readAxisData([0x00, 0x01]);
+  let By = readAxisData([0x02, 0x03]);
+  let Bz = readAxisData([0x04, 0x05]);
+  return { Bx, By, Bz };
+};
