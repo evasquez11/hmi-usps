@@ -38,6 +38,7 @@ io.on('connection', (socket) => {
             console.error('GPIO Sensor 2 Error:', err);
             return;
         }
+        socket.emit('gpioData2', value); // Emit actuator sensor state to client
         if (value === 1) { // Actuator sensor activated
             actuatorActivated = true;
             gpioSensor1.writeSync(1); // Turn on LED for actuator activation
@@ -51,6 +52,7 @@ io.on('connection', (socket) => {
             console.error('GPIO Sensor 4 Error:', err);
             return;
         }
+        socket.emit('gpioData4', value); // Emit bin sensor state to client
         if (value === 1) { // Package detected at the bin
             if (actuatorActivated) {
                 console.log('Package correctly sorted.');
