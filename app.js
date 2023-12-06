@@ -14,7 +14,7 @@ io.on('connection', (socket) => {
     const gpioSensor2 = new Gpio(4, 'in', 'both'); // Actuator sensor
     const gpioSensor3 = new Gpio(6, 'out'); // Miss-sort LED
     const gpioSensor4 = new Gpio(5, 'in', 'both'); // Bin sensor
-    const missSortLedOnDuration = 10000; // 10 seconds, adjust as needed
+    const missSortLedOnDuration = 5000; // 10 seconds, adjust as needed
 
     let actuatorActivated = false;
     let packageExpectedTime = 5000; // 5 seconds for package to reach bin after actuator activation
