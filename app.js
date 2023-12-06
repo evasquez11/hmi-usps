@@ -57,29 +57,20 @@ io.on('connection', (socket) => {
             console.error('GPIO Sensor 4 Error:', err);
             return;
         }
-        console.log('GPIO Sensor 4 Value:', value); // Log the value for debugging
         socket.emit('gpioData4', value); // Emit bin sensor state to client
+        if (value === 1) { // Package detected at the bin
+            if (actuatorActivated) {
+                console.log('Package correctly sorted.');
+                gpioSensor1.writeSync(0); // Turn off actuator LED
+                resetSystem();
+            } else {
+                console.log('Miss-sort detected: Package arrived without actuator activation.');
+                gpioSensor3.writeSync(1); // Turn on LED for miss-sort detection
+                socket.emit('missSort', 'Miss-sort detected: Package without actuator activation');
+                setTimeout(resetSystem, missSortLedOnDuration); // Delay the reset system
+            }
+        }
     });
-    
-    // gpioSensor4.watch((err, value) => {
-    //     if (err) {
-    //         console.error('GPIO Sensor 4 Error:', err);
-    //         return;
-    //     }
-    //     socket.emit('gpioData4', value); // Emit bin sensor state to client
-    //     if (value === 1) { // Package detected at the bin
-    //         if (actuatorActivated) {
-    //             console.log('Package correctly sorted.');
-    //             gpioSensor1.writeSync(0); // Turn off actuator LED
-    //             resetSystem();
-    //         } else {
-    //             console.log('Miss-sort detected: Package arrived without actuator activation.');
-    //             gpioSensor3.writeSync(1); // Turn on LED for miss-sort detection
-    //             socket.emit('missSort', 'Miss-sort detected: Package without actuator activation');
-    //             setTimeout(resetSystem, missSortLedOnDuration); // Delay the reset system
-    //         }
-    //     }
-    // });
 
     socket.on('disconnect', () => {
         console.log('Client disconnected');
