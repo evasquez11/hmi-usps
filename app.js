@@ -16,34 +16,28 @@ const io = socketIo(server);
 app.use(express.static('public')); // Serve static files from 'public' directory
 
 io.on('connection', (socket) => {
-
-    const gpioSensor1 = new Gpio(17, 'out'); // Use gpioSensor1 as LED (output)
-    const gpioSensor2 = new Gpio(4, 'in', 'both'); // Use gpioSensor2 as Button (input)
-
+    // Adjust GPIO pin numbers based on your hardware setup
+    const gpioSensor1 = new Gpio(17, 'out'); // LED (output)
+    const gpioSensor2 = new Gpio(4, 'in', 'both'); // Q2X sensor on the chute (input)
+    const gpioSensor3 = new Gpio(6, 'out'); // New LED on GPIO 6
+    const gpioSensor4 = new Gpio(5, 'in', 'both'); // Q2X sensor on the actuator (input)
 
     gpioSensor1.writeSync(1); // Turn LED on
-        
+
     gpioSensor2.watch((err, value) => {
         if (err) {
             console.error('GPIO Error:', err);
         } else {
-            gpioSensor1.writeSync(value); // Turn on/off LED based on button state
-            socket.emit('gpioData2', value); // Emit button state to client
-        }
-    });
-
-    const gpioSensor3 = new Gpio(6, 'out'); // New LED on GPIO 6
-    gpioSensor3.writeSync(1); // Turn new LED on and keep it on
-
-    // Reintroduce the switch (gpioSensor4)
-    const gpioSensor4 = new Gpio(5, 'in', 'both'); // New switch (input) on GPIO 5
-
-    gpioSensor4.watch((err, value) => {
-        if (err) {
-            console.error('GPIO Error:', err);
-        } else {
-            gpioSensor3.writeSync(value); // Turn on/off the new LED based on the switch state
-            socket.emit('gpioData1', value); // Emit the switch state to the client
+            // Adjust this logic based on your Q2X sensor behavior
+            if (value === 1) {
+                // Q2X sensor on the chute sensed something
+                // Perform actions or emit notifications
+                socket.emit('q2xChuteData', 'Package sensed at chute!');
+            } else {
+                // Q2X sensor on the chute didn't trigger
+                // Emit notification or perform actions for missort
+                socket.emit('q2xChuteData', 'Missort detected!');
+            }
         }
     });
 
