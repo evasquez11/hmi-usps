@@ -12,8 +12,9 @@ app.use(express.static('public')); // Serve static files from 'public' directory
 io.on('connection', (socket) => {
     const gpioSensor1 = new Gpio(17, 'out'); // Example LED (output)
     const gpioSensor2 = new Gpio(4, 'in', 'both'); // Actuator sensor
-    const gpioSensor3 = new Gpio(6, 'out'); // Another example LED
+    const gpioSensor3 = new Gpio(6, 'out'); // Miss-sort LED
     const gpioSensor4 = new Gpio(5, 'in', 'both'); // Bin sensor
+    const missSortLedOnDuration = 10000; // 10 seconds, adjust as needed
 
     let actuatorActivated = false;
     let packageExpectedTime = 5000; // 5 seconds for package to reach bin after actuator activation
@@ -25,15 +26,18 @@ io.on('connection', (socket) => {
         console.log('System reset for next cycle');
     }
 
-    function checkForMissSort(binSensorValue) {
+    function checkForMissSort() {
+        const binSensorValue = gpioSensor4.readSync();
         if (actuatorActivated && binSensorValue === 0) {
             console.log('Miss-sort detected: Actuator activated but no package detected.');
+            gpioSensor3.writeSync(1); // Turn on LED for miss-sort detection
             socket.emit('missSort', 'Miss-sort detected');
+            setTimeout(resetSystem, missSortLedOnDuration); // Delay the reset system
+        } else {
+            resetSystem();
         }
-        resetSystem();
     }
 
-    //actuator sensor
     gpioSensor2.watch((err, value) => {
         if (err) {
             console.error('GPIO Sensor 2 Error:', err);
@@ -44,11 +48,10 @@ io.on('connection', (socket) => {
             actuatorActivated = true;
             gpioSensor1.writeSync(1); // Turn on LED for actuator activation
             console.log('Actuator activated, awaiting package...');
-            setTimeout(() => checkForMissSort(gpioSensor4.readSync()), packageExpectedTime);
+            setTimeout(checkForMissSort, packageExpectedTime);
         }
     });
     
-    // bin sensor
     gpioSensor4.watch((err, value) => {
         if (err) {
             console.error('GPIO Sensor 4 Error:', err);
@@ -64,7 +67,7 @@ io.on('connection', (socket) => {
                 console.log('Miss-sort detected: Package arrived without actuator activation.');
                 gpioSensor3.writeSync(1); // Turn on LED for miss-sort detection
                 socket.emit('missSort', 'Miss-sort detected: Package without actuator activation');
-                resetSystem();
+                setTimeout(resetSystem, missSortLedOnDuration); // Delay the reset system
             }
         }
     });
