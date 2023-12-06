@@ -86,9 +86,18 @@ server.listen(3000, () => {
 });
 
 process.on('SIGINT', () => {
-    gpioSensor1.unexport();
-    gpioSensor2.unexport();
-    gpioSensor3.unexport();
-    gpioSensor4.unexport();
+    if (gpioSensor1) {
+        gpioSensor1.unexport();
+    }
+    if (gpioSensor2) {
+        gpioSensor2.unexport();
+    }
+    if (gpioSensor3) {
+        gpioSensor3.unexport();
+    }
+    if (gpioSensor4) {
+        gpioSensor4.unexport();
+    }
     process.exit();
 });
+
