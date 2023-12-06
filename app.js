@@ -25,15 +25,13 @@ io.on('connection', (socket) => {
         console.log('System reset for next cycle');
     }
 
-    function checkForMissSort() {
-        const binSensorValue = gpioSensor4.readSync();
-        if (actuatorActivated && binSensorValue === 0) { // No package detected within the time frame
-            console.log('Miss-sort detected: Actuator activated but no package detected within the expected time.');
-            gpioSensor3.writeSync(1); // Turn on LED for miss-sort detection
-            socket.emit('missSort', 'Miss-sort detected: No package detected within the expected time');
+    function checkForMissSort(binSensorValue) {
+        if (actuatorActivated && binSensorValue === 0) {
+            console.log('Miss-sort detected: Actuator activated but no package detected.');
+            socket.emit('missSort', 'Miss-sort detected');
         }
         resetSystem();
-    }    
+    }
 
     //actuator sensor
     gpioSensor2.watch((err, value) => {
@@ -46,7 +44,7 @@ io.on('connection', (socket) => {
             actuatorActivated = true;
             gpioSensor1.writeSync(1); // Turn on LED for actuator activation
             console.log('Actuator activated, awaiting package...');
-            setTimeout(checkForMissSort, packageExpectedTime);
+            setTimeout(() => checkForMissSort(gpioSensor4.readSync()), packageExpectedTime);
         }
     });
     
