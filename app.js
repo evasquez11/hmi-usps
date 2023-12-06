@@ -14,7 +14,7 @@ io.on('connection', (socket) => {
     const gpioSensor2 = new Gpio(4, 'in', 'both'); // Actuator sensor
     const gpioSensor3 = new Gpio(6, 'out'); // Miss-sort LED
     const gpioSensor4 = new Gpio(5, 'in', 'both'); // Bin sensor
-    const missSortLedOnDuration = 5000; // 10 seconds, adjust as needed
+    const missSortLedOnDuration = 5000; // 5 seconds, adjust as needed
 
     let actuatorActivated = false;
     let packageExpectedTime = 5000; // 5 seconds for package to reach bin after actuator activation
@@ -57,7 +57,7 @@ io.on('connection', (socket) => {
             console.error('GPIO Sensor 4 Error:', err);
             return;
         }
-        socket.emit('gpioData4', value); // Emit bin sensor state to client
+        socket.emit('gpioData1', value); // Emit bin sensor state to client
         if (value === 1) { // Package detected at the bin
             if (actuatorActivated) {
                 console.log('Package correctly sorted.');
