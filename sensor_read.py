@@ -8,7 +8,7 @@ tlv1 = adafruit_tlv493d.TLV493D(i2c, address=0x5e)
 
 
 # Initialize the second sensor (Slave #1)
-tlv2 = adafruit_tlv493d.TLV493D(i2c, address=0x5e)
+tlv2 = adafruit_tlv493d.TLV493D(i2c, address=0x1f)
 
 while True:
     print("Sensor 1 - X: %s, Y: %s, Z: %s uT" % tlv1.magnetic)
