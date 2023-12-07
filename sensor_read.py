@@ -12,6 +12,6 @@ tlv1 = adafruit_tlv493d.TLV493D(i2c, address=0x5e)
 
 while True:
     print("Sensor 1 - X: %s, Y: %s, Z: %s uT" % tlv1.magnetic)
-    print("Sensor 2 - X: %s, Y: %s, Z: %s uT" % tlv2.magnetic)
+    #print("Sensor 2 - X: %s, Y: %s, Z: %s uT" % tlv2.magnetic)
     time.sleep(1)
 
