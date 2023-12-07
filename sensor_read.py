@@ -4,11 +4,11 @@ import adafruit_tlv493d
 
 i2c = board.I2C()  # uses board.SCL and board.SDA
 #Initialize the first sensor (Slave #0)
-tlv1 = adafruit_tlv493d.TLV493D(i2c, address=0x5e) 
+tlv1 = adafruit_tlv493d.TLV493D(i2c, address=0x1f) 
 
 
 # Initialize the second sensor (Slave #1)
-# tlv2 = adafruit_tlv493d.TLV493D(i2c, address=)
+tlv2 = adafruit_tlv493d.TLV493D(i2c, address=5e)
 
 while True:
     print("Sensor 1 - X: %s, Y: %s, Z: %s uT" % tlv1.magnetic)
