@@ -2,6 +2,9 @@ import time
 import board
 import adafruit_mmc56x3
 import adafruit_tlv493d
+import websocket
+import json
+import threading
 
 # Initialize I2C and sensors
 i2c = board.I2C()
@@ -13,31 +16,52 @@ def read_magnetic_z(sensor):
     _, _, z = sensor.magnetic
     return abs(z)
 
-# Define threshold ranges for magnet detection on Z-axis for each sensor
-mmc_threshold_min_z = 40  # Replace with calibrated minimum threshold for MMC5603
-mmc_threshold_max_z = 60  # Replace with calibrated maximum threshold for MMC5603
-tlv_threshold_min_z = 45  # Replace with calibrated minimum threshold for TLV493D
-tlv_threshold_max_z = 65  # Replace with calibrated maximum threshold for TLV493D
+# WebSocket connection setup
+def on_message(ws, message):
+    print(f"Message from server: {message}")
 
-print("Starting magnetic field Z-axis data readings. Press Ctrl+C to stop.\n")
+def on_error(ws, error):
+    print(error)
 
-while True:
-    # Current time
-    current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+def on_close(ws):
+    print("Connection closed")
 
-    # Read absolute Z-axis magnetic field data from sensors
-    mmc_z_abs = read_magnetic_z(mmc_sensor)
-    tlv_z_abs = read_magnetic_z(tlv_sensor)
+def on_open(ws):
+    def run(*args):
+        while True:
+            # Current time
+            current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
-    # Check if the magnet is detected within the threshold range for each sensor
-    mmc_magnet_detected = mmc_threshold_min_z <= mmc_z_abs <= mmc_threshold_max_z
-    tlv_magnet_detected = tlv_threshold_min_z <= tlv_z_abs <= tlv_threshold_max_z
+            # Read absolute Z-axis magnetic field data from sensors
+            mmc_z_abs = read_magnetic_z(mmc_sensor)
+            tlv_z_abs = read_magnetic_z(tlv_sensor)
 
-    # Print Z-axis magnetic field data and detection status for both sensors
-    print(f"Time: {current_time}")
-    print(f"MMC5603 - Absolute Z: {mmc_z_abs:.2f} uT, Detected: {mmc_magnet_detected}")
-    print(f"TLV493D - Absolute Z: {tlv_z_abs:.2f} uT, Detected: {tlv_magnet_detected}")
-    print("-" * 40)  # Separator
+            # Check if the magnet is detected within the threshold range for each sensor
+            mmc_magnet_detected = mmc_threshold_min_z <= mmc_z_abs <= mmc_threshold_max_z
+            tlv_magnet_detected = tlv_threshold_min_z <= tlv_z_abs <= tlv_threshold_max_z
 
-    # Wait before next reading
-    time.sleep(0.5)
+            # Create a JSON object with the data
+            data = {
+                "time": current_time,
+                "mmc_z_abs": mmc_z_abs,
+                "mmc_magnet_detected": mmc_magnet_detected,
+                "tlv_z_abs": tlv_z_abs,
+                "tlv_magnet_detected": tlv_magnet_detected
+            }
+
+            # Send data via WebSocket
+            ws.send(json.dumps(data))
+
+            # Wait before next reading
+            time.sleep(0.5)
+
+    threading.Thread(target=run).start()
+
+if __name__ == "__main__":
+    websocket.enableTrace(True)
+    ws = websocket.WebSocketApp("ws://localhost:3000",
+                                on_message=on_message,
+                                on_error=on_error,
+                                on_close=on_close)
+    ws.on_open = on_open
+    ws.run_forever()
