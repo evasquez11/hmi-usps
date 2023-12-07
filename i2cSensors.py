@@ -14,10 +14,10 @@ def read_magnetic_z(sensor):
     return abs(z)
 
 # Define threshold ranges for magnet detection on Z-axis for each sensor
-mmc_threshold_min_z = 40  # Replace with your calibrated minimum threshold for MMC5603
-mmc_threshold_max_z = 60  # Replace with your calibrated maximum threshold for MMC5603
-tlv_threshold_min_z = 45  # Replace with your calibrated minimum threshold for TLV493D
-tlv_threshold_max_z = 65  # Replace with your calibrated maximum threshold for TLV493D
+mmc_threshold_min_z = 40  # Replace with calibrated minimum threshold for MMC5603
+mmc_threshold_max_z = 60  # Replace with calibrated maximum threshold for MMC5603
+tlv_threshold_min_z = 45  # Replace with calibrated minimum threshold for TLV493D
+tlv_threshold_max_z = 65  # Replace with calibrated maximum threshold for TLV493D
 
 print("Starting magnetic field Z-axis data readings. Press Ctrl+C to stop.\n")
 
