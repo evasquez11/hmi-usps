@@ -11,8 +11,12 @@ app.use(express.static('public')); // Serve static files from 'public' directory
 
 io.on('connection', (socket) => {
     const gpioSensor1 = new Gpio(17, 'out'); // Example LED (output)
+    gpioSensor1.writeSync(1);
+
     const gpioSensor2 = new Gpio(4, 'in', 'both'); // Actuator sensor
     const gpioSensor3 = new Gpio(6, 'out'); // Miss-sort LED
+    gpioSensor3.writeSync(1); // comment
+
     const gpioSensor4 = new Gpio(5, 'in', 'both'); // Bin sensor
     const missSortLedOnDuration = 5000; // 5 seconds, adjust as needed
     const debounceTime = 1000; // 1 second debounce time
