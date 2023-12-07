@@ -1,4 +1,5 @@
 import time
+import json
 import board
 import adafruit_mmc56x3
 import adafruit_tlv493d
@@ -19,25 +20,32 @@ mmc_threshold_max_z = 60  # Replace with your calibrated maximum threshold for M
 tlv_threshold_min_z = 45  # Replace with your calibrated minimum threshold for TLV493D
 tlv_threshold_max_z = 65  # Replace with your calibrated maximum threshold for TLV493D
 
-print("Starting magnetic field Z-axis data readings. Press Ctrl+C to stop.\n")
+try:
+    print("Starting magnetic field Z-axis data readings. Press Ctrl+C to stop.\n")
 
-while True:
-    # Current time
-    current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    while True:
+        # Read absolute Z-axis magnetic field data from sensors
+        mmc_z_abs = read_magnetic_z(mmc_sensor)
+        tlv_z_abs = read_magnetic_z(tlv_sensor)
 
-    # Read absolute Z-axis magnetic field data from sensors
-    mmc_z_abs = read_magnetic_z(mmc_sensor)
-    tlv_z_abs = read_magnetic_z(tlv_sensor)
+        # Check if the magnet is detected within the threshold range for each sensor
+        mmc_magnet_detected = mmc_threshold_min_z <= mmc_z_abs <= mmc_threshold_max_z
+        tlv_magnet_detected = tlv_threshold_min_z <= tlv_z_abs <= tlv_threshold_max_z
 
-    # Check if the magnet is detected within the threshold range for each sensor
-    mmc_magnet_detected = mmc_threshold_min_z <= mmc_z_abs <= mmc_threshold_max_z
-    tlv_magnet_detected = tlv_threshold_min_z <= tlv_z_abs <= tlv_threshold_max_z
+        # Create a JSON object with the data
+        data = {
+            "time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+            "mmc_z_abs": mmc_z_abs,
+            "mmc_magnet_detected": mmc_magnet_detected,
+            "tlv_z_abs": tlv_z_abs,
+            "tlv_magnet_detected": tlv_magnet_detected
+        }
 
-    # Print Z-axis magnetic field data and detection status for both sensors
-    print(f"Time: {current_time}")
-    print(f"MMC5603 - Absolute Z: {mmc_z_abs:.2f} uT, Detected: {mmc_magnet_detected}")
-    print(f"TLV493D - Absolute Z: {tlv_z_abs:.2f} uT, Detected: {tlv_magnet_detected}")
-    print("-" * 40)  # Separator
+        # Output the data as a JSON string
+        print(json.dumps(data))
 
-    # Wait before next reading
-    time.sleep(0.5)
+        # Wait before next reading
+        time.sleep(0.5)
+
+except KeyboardInterrupt:
+    print("Script terminated by user.")

@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const { Gpio } = require('onoff');
+const { spawn } = require('child_process');
 
 const app = express();
 const server = http.createServer(app);
@@ -90,6 +91,37 @@ io.on('connection', (socket) => {
         gpioSensor3.unexport();
         gpioSensor4.unexport();
     });
+
+
+    const pythonProcess = spawn('python', ['i2cSensors.py']);
+
+
+
+    pythonProcess.stdout.on('data', (data) => {
+        try {
+            const sensorData = JSON.parse(data.toString());
+            if (sensorData.mmc_magnet_detected || sensorData.tlv_magnet_detected) {
+                // Emitting to the frontend
+                socket.emit('magnetDetection', sensorData);
+            }
+        } catch (err) {
+            console.error('Error parsing Python script output:', err);
+        }
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`);
+    });
+
+    pythonProcess.on('close', (code) => {
+        console.log(`Python script exited with code ${code}`);
+    });
+
+    socket.on('disconnect', () => {
+        pythonProcess.kill(); // Terminate Python script on disconnect
+    });
+
+
 });
 
 server.listen(3000, () => {
@@ -97,6 +129,8 @@ server.listen(3000, () => {
 });
 
 process.on('SIGINT', () => {
+    pythonProcess.kill();
+
     if (gpioSensor1) {
         gpioSensor1.unexport();
     }
