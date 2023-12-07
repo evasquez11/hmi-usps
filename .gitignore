@@ -1,4 +1,25 @@
+# General
 .DS_Store
+
+# Node.js
 node_modules/
 npm-debug.log
+
+# Environment variables
 .env
+
+# Python
+# The name of the virtual environment directory (change if using a different name)
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+db.sqlite3
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Other files and directories to ignore
+# Add any other file extensions or directories as per your project's requirements
