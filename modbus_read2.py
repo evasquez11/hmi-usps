@@ -1,33 +1,18 @@
 import minimalmodbus
-import time
 
-# Modbus communication parameters
-modbus_unit_id = 1
-modbus_port = '/dev/ttyUSB0'
-modbus_baudrate = 38400
-modbus_parity = 'N'
-modbus_stopbits = 1
-modbus_bytesize = 8
-modbus_timeout = 15
-
-# Create Modbus instrument
-instrument = minimalmodbus.Instrument(modbus_port, modbus_unit_id)
-instrument.serial.baudrate = modbus_baudrate
-instrument.serial.parity = modbus_parity
-instrument.serial.stopbits = modbus_stopbits
-instrument.serial.bytesize = modbus_bytesize
-instrument.serial.timeout = modbus_timeout
+instrument = minimalmodbus.Instrument('/dev/ttyUSB0', 1)  # Replace 1 with your actual unit ID
+instrument.serial.baudrate = 38400
+instrument.serial.parity = 'N'
+instrument.serial.stopbits = 1
+instrument.serial.bytesize = 8
+instrument.serial.timeout = 2  # Adjust as needed
 
 try:
-    # Read Analog Data output (Register 40001)
-    analog_data_output = instrument.read_register(40001, functioncode=3, number_of_decimals=3)
-    print(f"Analog Data Output: {analog_data_output} mA")
-except minimalmodbus.ModbusException as e:
-    print(f"Modbus error: {e}")
+    # Read a register as a test
+    register_value = instrument.read_register(1, functioncode=3)
+    print(f"Register Value: {register_value}")
 except Exception as e:
-    print(f"General error: {e}")
-finally:
-    # Close the Modbus connection (not necessary for MinimalModbus)
-    pass
+    print(f"Error: {e}")
+
 
 
