@@ -4,6 +4,9 @@ FROM node:18.18.0
 # Set the working directory inside the container to /usr/src/app
 WORKDIR /usr/src/app
 
+# Install essential build tools
+RUN apt-get update && apt-get install -y build-essential
+
 # Copy the package.json and package-lock.json (if available) files
 COPY package*.json ./
 
