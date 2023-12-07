@@ -26,6 +26,8 @@ try:
 
     # Read Analog Data output (Register 40001)
     result = modbus_client.read_holding_registers(40001, 1, unit=modbus_unit_id)
+    print(result)
+    print(result.registers)
     if not result.isError():
         analog_data_output = result.registers[0] / 1000.0  # Convert to mA
         print(f"Analog Data Output: {analog_data_output} mA")
