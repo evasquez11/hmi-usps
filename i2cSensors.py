@@ -41,8 +41,11 @@ try:
             "tlv_magnet_detected": tlv_magnet_detected
         }
 
-        # Output the data as a JSON string
-        print(json.dumps(data))
+        # Print the data for debugging
+        print(f"Debug: Time: {data['time']}, MMC Z: {data['mmc_z_abs']}, MMC Detected: {data['mmc_magnet_detected']}, TLV Z: {data['tlv_z_abs']}, TLV Detected: {data['tlv_magnet_detected']}")
+
+        # Output the data as a JSON string with a unique identifier
+        print("JSON_OUTPUT:" + json.dumps(data))
 
         # Wait before next reading
         time.sleep(0.5)

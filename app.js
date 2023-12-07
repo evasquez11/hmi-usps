@@ -84,28 +84,25 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('disconnect', () => {
-        console.log('Client disconnected');
-        gpioSensor1.unexport();
-        gpioSensor2.unexport();
-        gpioSensor3.unexport();
-        gpioSensor4.unexport();
-    });
-
-
     const pythonProcess = spawn('python', ['i2cSensors.py']);
 
-
+    let buffer = '';
 
     pythonProcess.stdout.on('data', (data) => {
-        try {
-            const sensorData = JSON.parse(data.toString());
-            if (sensorData.mmc_magnet_detected || sensorData.tlv_magnet_detected) {
-                // Emitting to the frontend
-                socket.emit('magnetDetection', sensorData);
+        buffer += data.toString();
+        let boundary = buffer.indexOf('\n');
+        while (boundary !== -1) {
+            let input = buffer.substring(0, boundary);
+            buffer = buffer.substring(boundary + 1);
+            if (input.startsWith('JSON_OUTPUT:')) {
+                try {
+                    const sensorData = JSON.parse(input.replace('JSON_OUTPUT:', ''));
+                    socket.emit('magnetDetection', sensorData);
+                } catch (err) {
+                    console.error('Error parsing Python script output:', err);
+                }
             }
-        } catch (err) {
-            console.error('Error parsing Python script output:', err);
+            boundary = buffer.indexOf('\n');
         }
     });
 
@@ -118,9 +115,13 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        pythonProcess.kill(); // Terminate Python script on disconnect
+        console.log('Client disconnected');
+        gpioSensor1.unexport();
+        gpioSensor2.unexport();
+        gpioSensor3.unexport();
+        gpioSensor4.unexport();
+        pythonProcess.kill(); // Terminate the Python script
     });
-
 
 });
 
