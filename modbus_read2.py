@@ -1,4 +1,5 @@
-from pymodbus.client.sync import ModbusSerialClient
+import minimalmodbus
+import time
 
 # Modbus communication parameters
 modbus_unit_id = 1
@@ -9,31 +10,24 @@ modbus_stopbits = 1
 modbus_bytesize = 8
 modbus_timeout = 5
 
-# Create Modbus client
-modbus_client = ModbusSerialClient(
-    method='rtu',
-    port=modbus_port,
-    baudrate=modbus_baudrate,
-    parity=modbus_parity,
-    stopbits=modbus_stopbits,
-    bytesize=modbus_bytesize,
-    timeout=modbus_timeout
-)
+# Create Modbus instrument
+instrument = minimalmodbus.Instrument(modbus_port, modbus_unit_id)
+instrument.serial.baudrate = modbus_baudrate
+instrument.serial.parity = modbus_parity
+instrument.serial.stopbits = modbus_stopbits
+instrument.serial.bytesize = modbus_bytesize
+instrument.serial.timeout = modbus_timeout
 
 try:
-    # Connect to the Modbus device
-    modbus_client.connect()
-
     # Read Analog Data output (Register 40001)
-    result = modbus_client.read_holding_registers(40001, 1, unit=modbus_unit_id)
-    if not result.isError():
-        analog_data_output = result.registers[0] / 1000.0  # Convert to mA
-        print(f"Analog Data Output: {analog_data_output} mA")
-    else:
-        print(f"Error reading Analog Data Output: {result}")
+    analog_data_output = instrument.read_register(40001, functioncode=3, number_of_decimals=3)
+    print(f"Analog Data Output: {analog_data_output} mA")
+except minimalmodbus.ModbusException as e:
+    print(f"Modbus error: {e}")
 except Exception as e:
-    print(f"Error: {e}")
+    print(f"General error: {e}")
 finally:
-    # Close the Modbus connection
-    modbus_client.close()
+    # Close the Modbus connection (not necessary for MinimalModbus)
+    pass
+
 
