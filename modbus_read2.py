@@ -8,7 +8,7 @@ modbus_baudrate = 19200
 modbus_parity = 'N'
 modbus_stopbits = 1
 modbus_bytesize = 8
-modbus_timeout = 5
+modbus_timeout = 10
 
 # Create Modbus instrument
 instrument = minimalmodbus.Instrument(modbus_port, modbus_unit_id)
