@@ -10,8 +10,9 @@ instrument.serial.rtscts = True
 
 try:
     # Read a register as a test
-    register_value = instrument.read_register(1, functioncode=3)
-    print(f"Register Value: {register_value}")
+    adjusted_register = 40000
+    analog_data_output = instrument.read_register(adjusted_register, functioncode=3, number_of_decimals=3)
+    print(f"Register Value: {analog_data_output}")
 except Exception as e:
     print(f"Error: {e}")
 
