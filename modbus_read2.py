@@ -4,8 +4,8 @@ import time
 # Modbus communication parameters
 modbus_unit_id = 1
 modbus_port = '/dev/ttyUSB0'
-modbus_baudrate = 38400
-modbus_parity = 'N'
+modbus_baudrate = 19200
+modbus_parity = 0
 modbus_stopbits = 1
 modbus_bytesize = 8
 modbus_timeout = 5
