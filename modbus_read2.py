@@ -1,4 +1,6 @@
-from pymodbus.client.sync import ModbusSerialClient
+from pymodbus.sync import ModbusSerialClient as ModbusClient
+from pymodbus.exceptions import ModbusException
+import time
 
 # Modbus communication parameters
 modbus_unit_id = 1
@@ -10,7 +12,7 @@ modbus_bytesize = 8
 modbus_timeout = 5
 
 # Create Modbus client
-modbus_client = ModbusSerialClient(
+modbus_client = ModbusClient(
     method='rtu',
     port=modbus_port,
     baudrate=modbus_baudrate,
@@ -26,16 +28,18 @@ try:
 
     # Read Analog Data output (Register 40001)
     result = modbus_client.read_holding_registers(40001, 1, unit=modbus_unit_id)
-    print(result)
-    print(result.registers)
+    print(result)  # Print the result object for debugging
     if not result.isError():
         analog_data_output = result.registers[0] / 1000.0  # Convert to mA
         print(f"Analog Data Output: {analog_data_output} mA")
     else:
         print(f"Error reading Analog Data Output: {result}")
+except ModbusException as e:
+    print(f"Modbus error: {e}")
 except Exception as e:
-    print(f"Error: {e}")
+    print(f"General error: {e}")
 finally:
     # Close the Modbus connection
     modbus_client.close()
+
 
