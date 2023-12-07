@@ -1,3 +1,4 @@
+import time
 import board
 import adafruit_tlv493d
 
